@@ -1,0 +1,39 @@
+/* Basic styling for task cards and form */
+.task-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+}
+
+.task-card {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.task-actions a {
+    color: #0f7bff;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.task-actions a:hover {
+    text-decoration: underline;
+}
+
+.btn {
+    background-color: #0f7bff;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    color: #fff;
+}

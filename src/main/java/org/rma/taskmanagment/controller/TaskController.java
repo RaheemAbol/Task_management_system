@@ -4,11 +4,14 @@ import org.rma.taskmanagment.model.Task;
 import org.rma.taskmanagment.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/tasks")
 public class TaskController {
 
@@ -16,35 +19,39 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public String getAllTasks(Model model) {
+        List<Task> tasks = taskService.getAllTasks();
+        model.addAttribute("tasks", tasks);
+        return "task-list";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-        return taskService.getTaskById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/new")
+    public String showCreateTaskForm(Model model) {
+        Task task = new Task();
+        model.addAttribute("task", task);
+        return "task-form";
     }
 
-    @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
-        try {
-            Task task = taskService.updateTask(id, updatedTask);
-            return ResponseEntity.ok(task);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/edit/{id}")
+    public String showEditTaskForm(@PathVariable Long id, Model model) {
+        Optional<Task> optionalTask = taskService.getTaskById(id);
+        if (optionalTask.isPresent()) {
+            model.addAttribute("task", optionalTask.get());
+        } else {
+            return "redirect:/tasks"; // Redirect back to the list if the task is not found
         }
+        return "task-form";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    @PostMapping("/save")
+    public String saveTask(@ModelAttribute("task") Task task) {
+        taskService.updateTask(task.getId(), task);
+        return "redirect:/tasks";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/tasks";
     }
 }
